@@ -7,29 +7,20 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import static edu.mum.waa.FileUtils.*;
 
 public class BareBonesHTTPD extends Thread {
-
-    private static final int PORT_NUMBER = 8080;
-    private static final String PUBLIC_DIRECTORY = "lab1/public";
-    private static final String DATE_FORMAT = "MMM dd yyyy HH:mm";
-
+    public static final int PORT_NUMBER = 8080;
     private Socket connectedClient = null;
-    private SimpleDateFormat df = new SimpleDateFormat(DATE_FORMAT);
 
     public BareBonesHTTPD(Socket client) {
         connectedClient = client;
     }
 
     public void run() {
-
         try {
             System.out.println(connectedClient.getInetAddress() + ":" + connectedClient.getPort() + " is connected");
 
@@ -37,82 +28,14 @@ public class BareBonesHTTPD extends Thread {
 
             if (httpRequest != null) {
                 BBHttpResponse httpResponse = new BBHttpResponse();
-
                 processRequest(httpRequest, httpResponse);
-
                 sendResponse(httpResponse);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private String generateOneRow(String name, String path, File file) throws IOException {
-        String fileSize = readableFileSize(file.length());
-        BasicFileAttributes attributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-        String lastModifiedTime = df.format(attributes.lastModifiedTime().toMillis());
-
-        StringBuilder out = new StringBuilder();
-
-        out.append("<tr>");
-        out.append("<td style=\"text-align: right; padding-left: 1em\"><code>" + fileSize + "</code></td>");
-        out.append("<td style=\"text-align: right; padding-left: 1em\"><code>" + lastModifiedTime + "</code></td>");
-        out.append("<td style=\"padding-left: 1em\"><code><a href=\"" + path + "\">");
-        if (file.isDirectory()) {
-            out.append("<b>" + name + "</b>");
-        } else {
-            out.append(name);
-        }
-        out.append("</a></code>");
-        out.append("</td>");
-        out.append("</tr>");
-
-        return out.toString();
-    }
-
-    private String generateFolderContent(Path path) throws IOException {
-        String pathStr = path.toString().replace(PUBLIC_DIRECTORY, "");
-
-        if (pathStr.isEmpty()) {
-            pathStr = "/";
-        }
-
-        StringBuilder response = new StringBuilder();
-
-        response.append("<!DOCTYPE html>");
-        response.append("<html>");
-        response.append("<head>");
-        response.append("<title>BareBonesHTTPD - Index of " + pathStr + "</title>");
-        response.append("</head>");
-        response.append("<body>");
-        response.append("<h1>Index of " + pathStr + "</h1>");
-        response.append("<table>");
-
-        List<File> files = getFilesInFolder(path);
-
-        response.append(generateOneRow("./", pathStr, path.toFile()));
-
-        if (!pathStr.equals("/")) {
-            response.append(generateOneRow("../", "..", path.getParent().toFile()));
-        }
-
-        for (File file : files) {
-            response.append(generateOneRow(
-                    file.getName(),
-                    file.getPath().replace(PUBLIC_DIRECTORY, ""),
-                    file)
-            );
-        }
-
-        response.append("</table>");
-        response.append("<br/>");
-        response.append("<address>BareBonesHTTPD server running @ localhost:" + PORT_NUMBER + "</address>");
-        response.append("</body>");
-        response.append("</html>");
-
-        return response.toString();
-    }
 
     private void processRequest(BBHttpRequest httpRequest, BBHttpResponse httpResponse) throws IOException {
         String fileURI = httpRequest.getUri();
@@ -135,11 +58,8 @@ public class BareBonesHTTPD extends Thread {
     }
 
     private BBHttpRequest getRequest(InputStream inputStream) throws IOException {
-
         BBHttpRequest httpRequest = new BBHttpRequest();
-
         BufferedReader fromClient = new BufferedReader(new InputStreamReader(inputStream));
-
         String headerLine = fromClient.readLine();
 
         if (headerLine.isEmpty()) {
@@ -161,7 +81,6 @@ public class BareBonesHTTPD extends Thread {
         ArrayList<String> body = new ArrayList<>();
 
         while (fromClient.ready()) {
-
             headerLine = fromClient.readLine();
             System.out.println(headerLine);
 
@@ -175,8 +94,10 @@ public class BareBonesHTTPD extends Thread {
                 readingBody = true;
             }
         }
+
         httpRequest.setFields(fields);
         httpRequest.setMessage(body);
+
         return httpRequest;
     }
 
@@ -200,7 +121,6 @@ public class BareBonesHTTPD extends Thread {
         String contentTypeLine = "Content-Type: " + response.getContentType();
 
         try (DataOutputStream toClient = new DataOutputStream(connectedClient.getOutputStream())) {
-
             toClient.writeBytes(statusLine + "\r\n");
             toClient.writeBytes(serverDetails + "\r\n");
             toClient.writeBytes(contentTypeLine + "\r\n");
@@ -217,7 +137,6 @@ public class BareBonesHTTPD extends Thread {
     }
 
     public static void main(String args[]) throws Exception {
-
         try (ServerSocket server = new ServerSocket(PORT_NUMBER, 10, InetAddress.getByName("127.0.0.1"))) {
             System.out.println("Server Started on port " + PORT_NUMBER);
 
