@@ -4,6 +4,7 @@ public class BBHttpResponse {
     private int statusCode;
     private String contentType = "text/html; charset=utf-8";
     private String message;
+    private byte[] payload;
 
     public int getStatusCode() {
         return statusCode;
@@ -27,5 +28,13 @@ public class BBHttpResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public byte[] getPayload() {
+        return payload;
+    }
+
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
     }
 }

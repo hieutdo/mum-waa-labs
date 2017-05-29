@@ -4,12 +4,19 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 public class BareBonesHTTPD extends Thread {
 
-    private static final int PortNumber = 8080;
+    private static final int PORT_NUMBER = 8080;
+    private static final String PUBLIC_DIRECTORY = "lab1/public";
 
     private Socket connectedClient = null;
 
@@ -37,35 +44,75 @@ public class BareBonesHTTPD extends Thread {
         }
     }
 
-    private void processRequest(BBHttpRequest httpRequest, BBHttpResponse httpResponse) {
+    private List<File> getFilesInFolder(Path path) throws IOException {
+        return Files.list(path).map(Path::toFile).collect(Collectors.toList());
+    }
+
+    private String getFileMimeType(File file) throws IOException {
+        return URLConnection.guessContentTypeFromName(file.getName());
+    }
+
+    private String generateFolderContent(Path path) throws IOException {
+        String pathStr = path.toString().replace(PUBLIC_DIRECTORY, "");
+
+        if (pathStr.isEmpty()) {
+            pathStr = "/";
+        }
 
         StringBuilder response = new StringBuilder();
+
         response.append("<!DOCTYPE html>");
         response.append("<html>");
         response.append("<head>");
-        response.append("<title>Almost an HTTP Server</title>");
+        response.append("<title>BareBonesHTTPD - Index of " + pathStr + "</title>");
         response.append("</head>");
         response.append("<body>");
-        response.append("<h1>This is the HTTP Server</h1>");
-        response.append("<h2>Your request was:</h2>\r\n");
-        response.append("<h3>Request Line:</h3>\r\n");
-        response.append(httpRequest.getStartLine());
-        response.append("<br />");
-        response.append("<h3> Header Fields: </h3>");
-        for (String headerField : httpRequest.getFields()) {
-            response.append(headerField.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;"));
-            response.append("<br />");
+        response.append("<h1>Index of " + pathStr + "</h1>");
+        response.append("<ul>");
+
+        List<File> files = getFilesInFolder(path);
+
+        if (!pathStr.equals("/")) {
+            response.append("<li>");
+            response.append("<a href=\"..\">../</a>");
+            response.append("</li>");
         }
-        response.append("<h3> Payload: </h3>");
-        for (String messageLine : httpRequest.getMessage()) {
-            response.append(messageLine.replace("<", "&lt;").replace("&", "&amp;"));
-            response.append("<br />");
+
+        for (File file : files) {
+            response.append("<li>");
+            response.append("<a href=\"" + file.getPath().replace(PUBLIC_DIRECTORY, "") + "\">")
+                    .append(file.getName())
+                    .append("</a>");
+            response.append("</li>");
         }
+
+        response.append("</ul>");
+        response.append("<br/>");
+        response.append("<address>BareBonesHTTPD server running @ localhost:" + PORT_NUMBER + "</address>");
         response.append("</body>");
         response.append("</html>");
 
+        return response.toString();
+    }
+
+    private void processRequest(BBHttpRequest httpRequest, BBHttpResponse httpResponse) throws IOException {
+        String fileURI = httpRequest.getUri();
+        Path filePath = Paths.get(PUBLIC_DIRECTORY + fileURI);
+
+        if (!Files.exists(filePath)) {
+            httpResponse.setStatusCode(404);
+            httpResponse.setMessage("Oops! File not found: " + fileURI);
+            return;
+        }
+
+        if (Files.isDirectory(filePath)) {
+            httpResponse.setMessage(generateFolderContent(filePath));
+        } else {
+            httpResponse.setPayload(Files.readAllBytes(filePath));
+            httpResponse.setContentType(getFileMimeType(filePath.toFile()));
+        }
+
         httpResponse.setStatusCode(200);
-        httpResponse.setMessage(response.toString());
     }
 
     private BBHttpRequest getRequest(InputStream inputStream) throws IOException {
@@ -115,35 +162,45 @@ public class BareBonesHTTPD extends Thread {
     }
 
     private void sendResponse(BBHttpResponse response) throws IOException {
-
         String statusLine = null;
+
         if (response.getStatusCode() == 200) {
-            statusLine = "HTTP/1.1 200 OK" + "\r\n";
+            statusLine = "HTTP/1.1 200 OK";
+        } else if (response.getStatusCode() == 404) {
+            statusLine = "HTTP/1.1 404 Not Found";
         } else {
-            statusLine = "HTTP/1.1 501 Not Implemented" + "\r\n";
+            statusLine = "HTTP/1.1 501 Not Implemented";
         }
 
-        String serverdetails = "Server: BareBones HTTPServer";
-        String contentLengthLine = "Content-Length: " + response.getMessage().length() + "\r\n";
-        String contentTypeLine = "Content-Type: " + response.getContentType() + " \r\n";
+        long contentLength = response.getMessage() != null
+                ? response.getMessage().length()
+                : response.getPayload().length;
+
+        String serverDetails = "Server: BareBones HTTPServer";
+        String contentLengthLine = "Content-Length: " + contentLength;
+        String contentTypeLine = "Content-Type: " + response.getContentType();
 
         try (DataOutputStream toClient = new DataOutputStream(connectedClient.getOutputStream())) {
 
-            toClient.writeBytes(statusLine);
-            toClient.writeBytes(serverdetails);
-            toClient.writeBytes(contentTypeLine);
-            toClient.writeBytes(contentLengthLine);
+            toClient.writeBytes(statusLine + "\r\n");
+            toClient.writeBytes(serverDetails + "\r\n");
+            toClient.writeBytes(contentTypeLine + "\r\n");
+            toClient.writeBytes(contentLengthLine + "\r\n");
             toClient.writeBytes("Connection: close\r\n");
             toClient.writeBytes("\r\n");
-            toClient.writeBytes(response.getMessage());
 
+            if (response.getPayload() != null) {
+                toClient.write(response.getPayload());
+            } else {
+                toClient.writeBytes(response.getMessage());
+            }
         }
     }
 
     public static void main(String args[]) throws Exception {
 
-        try (ServerSocket server = new ServerSocket(PortNumber, 10, InetAddress.getByName("127.0.0.1"))) {
-            System.out.println("Server Started on port " + PortNumber);
+        try (ServerSocket server = new ServerSocket(PORT_NUMBER, 10, InetAddress.getByName("127.0.0.1"))) {
+            System.out.println("Server Started on port " + PORT_NUMBER);
 
             while (true) {
                 Socket connected = server.accept();
