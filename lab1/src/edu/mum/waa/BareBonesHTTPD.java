@@ -1,6 +1,8 @@
 package edu.mum.waa;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,12 +10,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import static edu.mum.waa.FileUtils.*;
 
 public class BareBonesHTTPD extends Thread {
     public static final int PORT_NUMBER = 8080;
+    public static final Map<String, String> URI_MAPPING = new HashMap<String, String>() {{
+        put("/welcome.web", "edu.mum.waa.controllers.WelcomeController");
+        put("/contacts.web", "edu.mum.waa.controllers.ContactController");
+    }};
+
     private Socket connectedClient = null;
 
     public BareBonesHTTPD(Socket client) {
@@ -37,8 +46,21 @@ public class BareBonesHTTPD extends Thread {
     }
 
 
-    private void processRequest(BBHttpRequest httpRequest, BBHttpResponse httpResponse) throws IOException {
+    private void processRequest(BBHttpRequest httpRequest, BBHttpResponse httpResponse) throws IOException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
         String fileURI = httpRequest.getUri();
+
+        if (URI_MAPPING.containsKey(fileURI)) {
+            Class<?> controllerClass = Class.forName(URI_MAPPING.get(fileURI));
+            Object controller = controllerClass.newInstance();
+            Method generateMethod = controller.getClass().getMethod("generate");
+            String output = (String) generateMethod.invoke(controller);
+
+            httpResponse.setStatusCode(200);
+            httpResponse.setMessage(output);
+
+            return;
+        }
+
         Path filePath = Paths.get(PUBLIC_DIRECTORY + fileURI);
 
         if (!Files.exists(filePath)) {
