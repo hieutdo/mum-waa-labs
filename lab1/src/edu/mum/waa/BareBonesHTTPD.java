@@ -19,8 +19,18 @@ import static edu.mum.waa.FileUtils.*;
 public class BareBonesHTTPD extends Thread {
     public static final int PORT_NUMBER = 8080;
     public static final Map<String, String> URI_MAPPING = new HashMap<String, String>() {{
-        put("/welcome.web", "edu.mum.waa.controllers.WelcomeController");
-        put("/contacts.web", "edu.mum.waa.controllers.ContactController");
+        try {
+            Files.readAllLines(Paths.get("lab1/uri.mapping")).forEach(s -> {
+                String[] parts = s.split("-");
+                String[] URIs = parts[0].split(",");
+                String className = parts[1];
+                for (String URI : URIs) {
+                    put(URI, className);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }};
 
     private Socket connectedClient = null;
