@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Bank Account Manager</title>
+    </h:head>
+    <h:body>
+        <h2>Account List</h2>
+        <p>
+            <h:button value="Create Account" outcome="/accounts/create" />
+        </p>
+        <h:dataTable value="#{viewAccounts.accounts}" var="acc" border="1" cellspacing="1" cellpadding="10">
+            <h:column>
+                <f:facet name="header">Account Number</f:facet>
+                #{acc.accountnumber}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Customer Name</f:facet>
+                #{acc.customer.name}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Balance</f:facet>
+                <h:outputText value="#{acc.balance}">
+                    <f:convertNumber type="currency" minFractionDigits="2" />
+                </h:outputText>
+
+            </h:column>
+            <h:column>
+                <h:link value="Details" outcome="/accounts/detail">
+                    <f:param name="number" value="#{acc.accountnumber}" />
+                </h:link>
+                |
+                <h:link value="Deposit" outcome="deposit">
+                    <f:param name="number" value="#{acc.accountnumber}" />
+                </h:link>
+                |
+                <h:link value="Withdraw" outcome="/accounts/withdraw">
+                    <f:param name="number" value="#{acc.accountnumber}" />
+                </h:link>
+            </h:column>
+        </h:dataTable>
+    </h:body>
+</html>

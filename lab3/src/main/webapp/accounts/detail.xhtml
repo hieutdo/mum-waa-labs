@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <f:metadata>
+        <f:viewParam id="number" name="number"
+                     value="#{editAccount.account}"
+                     required="true"
+                     requiredMessage="Bad request! Account number is missing."
+                     converter="#{accountConverter}"
+        />
+    </f:metadata>
+    <h:messages />
+    <h:form rendered="#{not empty editAccount.account}">
+        <p>
+            <h:commandButton value="Go back" action="/index?faces-redirect=true" />
+        </p>
+        <h2>Account Details</h2>
+        <h:panelGrid columns="2" border="1" cellpadding="10" cellspacing="1">
+            <h:outputLabel value="Account Number" />
+            <h:outputText value="#{editAccount.account.accountnumber}" />
+            <h:outputLabel value="Customer Name" />
+            <h:outputText value="#{editAccount.account.customer.name}" />
+            <h:outputLabel value="Balance" />
+            <h:outputText value="#{editAccount.account.balance}">
+                <f:convertNumber type="currency" minFractionDigits="2" />
+            </h:outputText>
+        </h:panelGrid>
+        <h2>Transactions</h2>
+        <h:dataTable border="1" cellpadding="10" cellspacing="1" value="#{editAccount.account.entryList}" var="entry">
+            <h:column>
+                <f:facet name="header">Date</f:facet>
+                <h:outputText value="#{entry.date}">
+                    <f:convertDateTime type="both" />
+                </h:outputText>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Amount</f:facet>
+                <h:outputText value="#{entry.amount}">
+                    <f:convertNumber type="currency" minFractionDigits="2" />
+                </h:outputText>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Description</f:facet>
+                #{entry.description}
+            </h:column>
+            <h:column>
+                <f:facet name="header">From Account Number</f:facet>
+                #{entry.fromAccountNumber}
+            </h:column>
+            <h:column>
+                <f:facet name="header">From Person Name</f:facet>
+                #{entry.fromPersonName}
+            </h:column>
+        </h:dataTable>
+    </h:form>
+</html>
