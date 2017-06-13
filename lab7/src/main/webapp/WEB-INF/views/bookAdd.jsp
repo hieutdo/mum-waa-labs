@@ -5,7 +5,7 @@
         <title>Add a Book</title>
     </head>
     <body>
-        <form action="books" method="post">
+        <form action="/books" method="post">
             <table>
                 <tr>
                     <td>Title:</td>

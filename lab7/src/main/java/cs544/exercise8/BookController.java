@@ -44,4 +44,9 @@ public class BookController {
         bookDao.add(book);
         return "redirect:/books";
     }
+
+    @RequestMapping(value = "/add", method = RequestMethod.GET)
+    public String addForm() {
+        return "bookAdd";
+    }
 }

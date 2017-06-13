@@ -28,6 +28,6 @@
             </c:forEach>
         </table>
 
-        <a href="/bookAdd.jsp">Add a Book</a>
+        <a href="/books/add">Add a Book</a>
     </body>
 </html>
