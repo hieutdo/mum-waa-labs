@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,6 +21,16 @@ public class Stadium {
 
     @OneToMany(mappedBy = "stadium")
     private List<Match> matches;
+
+    public Stadium() {
+    }
+
+    public Stadium(String name, String city, String state) {
+        this.name = name;
+        this.city = city;
+        this.state = state;
+        this.matches = new ArrayList<>();
+    }
 
     public Integer getId() {
         return id;

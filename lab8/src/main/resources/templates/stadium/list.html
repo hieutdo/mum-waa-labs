@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <title>Stadium List</title>
+    <!--/*/ <th:block th:include="fragments/header.inc :: head"></th:block> /*/-->
+  </head>
+  <body>
+    <div class="container">
+      <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+      <div th:if="${#lists.isEmpty(stadiums)}">
+        <h3>No stadiums found</h3>
+      </div>
+      <div th:if="${not #lists.isEmpty(stadiums)}">
+        <h2>Stadium List</h2>
+        <table class="table table-striped">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Actions</th>
+          </tr>
+          <tr th:each="stadium : ${stadiums}">
+            <td th:text="${stadium.id}">Id</td>
+            <td th:text="${stadium.name}">Name</td>
+            <td th:text="${stadium.city}">City</td>
+            <td th:text="${stadium.state}">State</td>
+            <td>
+              <a th:href="@{/stadiums/detail/{id}(id=${stadium.id})}">Edit</a> |
+              <a th:href="@{/stadiums/delete/{id}(id=${stadium.id})}">Delete</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
