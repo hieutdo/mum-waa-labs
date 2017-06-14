@@ -23,14 +23,14 @@
             <th>Actions</th>
           </tr>
           <tr th:each="team : ${teams}">
-            <td><a th:href="@{/teams/{id}(id=${team.id})}" th:text="${team.id}">Id</a></td>
+            <td th:text="${team.id}">Id</td>
             <td th:text="${team.name}">Name</td>
             <td th:text="${team.city}">City</td>
             <td th:text="${team.mascot}">Mascot</td>
             <td th:text="${team.homeUniform}">Home Uniform</td>
             <td th:text="${team.visitorUniform}">Visitor Uniform</td>
             <td>
-              <a th:href="@{/teams/edit/{id}(id=${team.id})}">Edit</a> |
+              <a th:href="@{/teams/detail/{id}(id=${team.id})}">Edit</a> |
               <a th:href="@{/teams/delete/{id}(id=${team.id})}">Delete</a>
             </td>
           </tr>
