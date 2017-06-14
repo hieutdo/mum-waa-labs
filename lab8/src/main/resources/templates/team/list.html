@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <title>Team List</title>
+    <!--/*/ <th:block th:include="fragments/header.inc :: head"></th:block> /*/-->
+  </head>
+  <body>
+    <div class="container">
+      <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+      <div th:if="${#lists.isEmpty(teams)}">
+        <h3>No teams found</h3>
+      </div>
+      <div th:if="${not #lists.isEmpty(teams)}">
+        <h2>Team List</h2>
+        <table class="table table-striped">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>Mascot</th>
+            <th>Home Uniform</th>
+            <th>Visitor Uniform</th>
+            <th>Actions</th>
+          </tr>
+          <tr th:each="team : ${teams}">
+            <td><a th:href="@{/teams/{id}(id=${team.id})}" th:text="${team.id}">Id</a></td>
+            <td th:text="${team.name}">Name</td>
+            <td th:text="${team.city}">City</td>
+            <td th:text="${team.mascot}">Mascot</td>
+            <td th:text="${team.homeUniform}">Home Uniform</td>
+            <td th:text="${team.visitorUniform}">Visitor Uniform</td>
+            <td>
+              <a th:href="@{/teams/edit/{id}(id=${team.id})}">Edit</a> |
+              <a th:href="@{/teams/delete/{id}(id=${team.id})}">Delete</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

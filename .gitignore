@@ -1,8 +1,9 @@
 .idea
+.mvn/
 *.iml
 *.DS_Store
 .settings
 .classpath
 .project
-out
-target
+out/
+target/

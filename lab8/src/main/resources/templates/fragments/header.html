@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en"></head>
+  <body>
+    <div th:fragment="header">
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#" th:href="@{/}">Home</a>
+            <ul class="nav navbar-nav">
+              <li><a href="#" th:href="@{/teams}">Teams</a></li>
+              <li><a href="#" th:href="@{/teams/create}">Create Team</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div class="jumbotron">
+        <div class="row text-center">
+          <h2>WAA Spring Boot Web App</h2>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
