@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head lang="en">
     <title>Team List</title>
     <!--/*/ <th:block th:include="fragments/header.inc :: head"></th:block> /*/-->
@@ -20,7 +21,7 @@
             <th>Mascot</th>
             <th>Home Uniform</th>
             <th>Visitor Uniform</th>
-            <th>Actions</th>
+            <th sec:authorize="hasRole('ROLE_FULL')">Actions</th>
           </tr>
           <tr th:each="team : ${teams}">
             <td th:text="${team.id}">Id</td>
@@ -29,7 +30,7 @@
             <td th:text="${team.mascot}">Mascot</td>
             <td th:text="${team.homeUniform}">Home Uniform</td>
             <td th:text="${team.visitorUniform}">Visitor Uniform</td>
-            <td>
+            <td sec:authorize="hasRole('ROLE_FULL')">
               <a th:href="@{/teams/detail/{id}(id=${team.id})}">Edit</a> |
               <a th:href="@{/teams/delete/{id}(id=${team.id})}">Delete</a>
             </td>

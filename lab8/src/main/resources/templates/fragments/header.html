@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head lang="en"></head>
   <body>
     <div th:fragment="header">
@@ -8,13 +9,37 @@
           <div class="navbar-header">
             <a class="navbar-brand" href="#" th:href="@{/}">Home</a>
             <ul class="nav navbar-nav">
-              <li><a href="#" th:href="@{/teams}">Teams</a></li>
-              <li><a href="#" th:href="@{/stadiums}">Stadiums</a></li>
-              <li><a href="#" th:href="@{/matches}">Matches</a></li>
+              <li>
+                <a href="#" th:href="@{/teams}">Teams</a>
+              </li>
+              <li>
+                <a href="#" th:href="@{/teams/create}" sec:authorize="hasRole('ROLE_FULL')">Create Teams</a>
+              </li>
+              <li>
+                <a href="#" th:href="@{/stadiums}">Stadiums</a>
+              </li>
+              <li>
+                <a href="#" th:href="@{/stadiums/create}" sec:authorize="hasRole('ROLE_FULL')">Create Stadiums</a>
+              </li>
+              <li>
+                <a href="#" th:href="@{/matches}">Matches</a>
+              </li>
+              <li>
+                <a href="#" th:href="@{/matches/create}" sec:authorize="hasRole('ROLE_FULL')">Create Matches</a>
+              </li>
+              <li>
+                <a href="#" th:href="@{/login}" sec:authorize="!isAuthenticated()">Login</a>
+              </li>
+              <li>
+                <a href="#" th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
+              </li>
             </ul>
           </div>
         </div>
       </nav>
+      <div class="welcome">
+        <strong sec:authorize="isAuthenticated()">Hello <span sec:authentication="name"></span></strong>
+      </div>
     </div>
   </body>
 </html>

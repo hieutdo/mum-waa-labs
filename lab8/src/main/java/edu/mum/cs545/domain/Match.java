@@ -110,4 +110,9 @@ public class Match {
     public void setHomeTeam(Team homeTeam) {
         this.homeTeam = homeTeam;
     }
+
+    @Override
+    public String toString() {
+        return this.homeTeam.getName() + " - " + this.visitorTeam.getName();
+    }
 }
