@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <title>Match List</title>
+    <!--/*/ <th:block th:include="fragments/header.inc :: head"></th:block> /*/-->
+  </head>
+  <body>
+    <div class="container">
+      <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+      <div th:if="${#lists.isEmpty(matches)}">
+        <h3>No matches found</h3>
+      </div>
+      <div th:if="${not #lists.isEmpty(matches)}">
+        <h2>Match List</h2>
+        <table class="table table-striped">
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>Stadium</th>
+            <th>Home Team</th>
+            <th>Visitor Team</th>
+            <th>Actions</th>
+          </tr>
+          <tr th:each="match : ${matches}">
+            <td th:text="${match.id}">Id</td>
+            <td th:text="${match.date}">Date</td>
+            <td th:text="${match.startTime}">Start Time</td>
+            <td th:text="${match.stadium}">Stadium</td>
+            <td th:text="${match.homeTeam}">Home Team</td>
+            <td th:text="${match.visitorTeam}">Visitor Team</td>
+            <td>
+              <a th:href="@{/matches/detail/{id}(id=${match.id})}">Edit</a> |
+              <a th:href="@{/matches/delete/{id}(id=${match.id})}">Delete</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

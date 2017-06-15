@@ -114,4 +114,9 @@ public class Team {
     public void setMatchesAsVisitor(List<Match> matchesAsVisitor) {
         this.matchesAsVisitor = matchesAsVisitor;
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

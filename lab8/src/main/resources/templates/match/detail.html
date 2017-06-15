@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <title>Match Detail</title>
+    <!--/*/ <th:block th:include="fragments/header.inc :: head"></th:block> /*/-->
+  </head>
+  <body>
+    <div class="container">
+      <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+      <h2>Match Details</h2>
+      <form class="form-horizontal" th:object="${match}" th:action="@{/matches}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Date:</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" th:field="*{date}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Start Time:</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" th:field="*{startTime}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Home Score:</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" th:field="*{homeScore}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Visitor Score:</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" th:field="*{visitorScore}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Stadium:</label>
+          <div class="col-sm-10">
+            <select th:field="*{stadium}">
+              <option th:each="std : ${stadiums}" th:text="${std.name}" th:value="${std.id}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Visitor Team:</label>
+          <div class="col-sm-10">
+            <select th:field="*{visitorTeam}">
+              <option th:each="team : ${teams}" th:text="${team.name}" th:value="${team.id}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Home Team:</label>
+          <div class="col-sm-10">
+            <select th:field="*{homeTeam}">
+              <option th:each="team : ${teams}" th:text="${team.name}" th:value="${team.id}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <a href="/matches" class="btn btn-default">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 package edu.mum.cs545.domain;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,9 +14,11 @@ public class Match {
     @GeneratedValue
     private Integer id;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
 
-    private Date startDate;
+    @DateTimeFormat(pattern = "hh:mm:ss")
+    private Date startTime;
 
     private int homeScore;
 
@@ -28,6 +32,20 @@ public class Match {
 
     @ManyToOne
     private Team homeTeam;
+
+    public Match() {
+    }
+
+    public Match(Date date, Date startTime, int homeScore, int visitorScore,
+                 Stadium stadium, Team visitorTeam, Team homeTeam) {
+        this.date = date;
+        this.startTime = startTime;
+        this.homeScore = homeScore;
+        this.visitorScore = visitorScore;
+        this.stadium = stadium;
+        this.visitorTeam = visitorTeam;
+        this.homeTeam = homeTeam;
+    }
 
     public Integer getId() {
         return id;
@@ -45,12 +63,12 @@ public class Match {
         this.date = date;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public Stadium getStadium() {
