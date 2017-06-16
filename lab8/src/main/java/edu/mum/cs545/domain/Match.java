@@ -1,5 +1,7 @@
 package edu.mum.cs545.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
@@ -8,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.util.Date;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 public class Match {
     @Id
